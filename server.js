@@ -1,9 +1,7 @@
 var express = require("express");
 var mongo = require("mongodb");
 var mongoose = require("mongoose");
-
-// Require model
-// var Product = require("./models/Product.js");
+var url = require("url");
 
 // Connect to MongoDB
 mongoose.connect(
@@ -39,15 +37,23 @@ app.get("/", function (req, res) {
 
 app.post("/api/shorturl/new", function (req, res) {
   // res.json({ req: req.body.url });
-  var myData = new Url(req.body);
-  myData
-    .save()
-    .then((item) => {
-      res.send("item saved to database");
-    })
-    .catch((err) => {
-      res.status(400).send("unable to save to database");
-    });
+
+  let result = url.parse(req.body.url);
+  if (result.hostname) {
+    res.send("A valid url");
+  } else {
+    res.send("Invalid URL");
+  }
+
+  // var myData = new Url(req.body);
+  // myData
+  //   .save()
+  //   .then((item) => {
+  //     res.send("item saved to database");
+  //   })
+  //   .catch((err) => {
+  //     res.status(400).send("unable to save to database");
+  //   });
 });
 
 // Start the server
