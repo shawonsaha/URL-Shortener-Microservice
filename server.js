@@ -15,6 +15,10 @@ mongoose.connect(
 
 var urlSchema = new mongoose.Schema({
   url: String,
+  hash: {
+    type: String,
+    default: shortid.generate,
+  },
 });
 
 var Url = mongoose.model("Url", urlSchema);
@@ -45,7 +49,7 @@ app.post("/api/shorturl/new", function (req, res) {
     myData
       .save()
       .then((item) => {
-        res.send("item saved to database. ShortID = " + shortid.generate());
+        res.send("item saved to database.");
       })
       .catch((err) => {
         res.status(400).send("unable to save to database");
@@ -53,6 +57,17 @@ app.post("/api/shorturl/new", function (req, res) {
   } else {
     res.send("Invalid URL");
   }
+});
+
+app.get("/:hash", function (req, res) {
+  // console.log(req.params.hash);
+  Url.findOne({ hash: req.params.hash }, function (err, doc) {
+    if (doc) {
+      res.redirect(doc.url);
+    } else {
+      res.redirect("/");
+    }
+  });
 });
 
 // Start the server
