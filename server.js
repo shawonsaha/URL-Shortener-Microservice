@@ -2,6 +2,7 @@ var express = require("express");
 var mongo = require("mongodb");
 var mongoose = require("mongoose");
 var url = require("url");
+const shortid = require("shortid");
 
 // Connect to MongoDB
 mongoose.connect(
@@ -40,20 +41,18 @@ app.post("/api/shorturl/new", function (req, res) {
 
   let result = url.parse(req.body.url);
   if (result.hostname) {
-    res.send("A valid url");
+    var myData = new Url(req.body);
+    myData
+      .save()
+      .then((item) => {
+        res.send("item saved to database. ShortID = " + shortid.generate());
+      })
+      .catch((err) => {
+        res.status(400).send("unable to save to database");
+      });
   } else {
     res.send("Invalid URL");
   }
-
-  // var myData = new Url(req.body);
-  // myData
-  //   .save()
-  //   .then((item) => {
-  //     res.send("item saved to database");
-  //   })
-  //   .catch((err) => {
-  //     res.status(400).send("unable to save to database");
-  //   });
 });
 
 // Start the server
